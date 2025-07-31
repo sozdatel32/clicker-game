@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Кликер Игра</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      padding: 20px 0;
+    }
+    #robot {
+      font-size: 5em;
+      text-align: center;
+      margin-top: auto;
+    }
+    #clicks {
+      font-size: 3em;
+      transition: color 0.5s;
+    }
+    .neon {
+      color: #39ff14;
+      text-shadow: 0 0 5px #39ff14, 0 0 10px #39ff14;
+    }
+    .rainbow {
+      background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbowMove 3s linear infinite;
+    }
+    @keyframes rainbowMove {
+      0% { background-position: 0% }
+      100% { background-position: 100% }
+    }
+    .rgbd {
+      background: linear-gradient(45deg, red, green, blue, darkred);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbdShift 2s infinite linear;
+    }
+    @keyframes rgbdShift {
+      from { background-position: 0 0; }
+      to { background-position: 100% 100%; }
+    }
+    .crazy {
+      background: linear-gradient(135deg, violet, beige, red);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: crazyGlow 1.5s infinite alternate;
+    }
+    @keyframes crazyGlow {
+      0% { text-shadow: 0 0 5px violet; }
+      100% { text-shadow: 0 0 15px red; }
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 2em;
+      margin-bottom: 30px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="level">Сложность: I</h1>
+    <div id="clicks">0</div>
+    <div id="robot">🤖</div>
+    <button id="clickBtn" onclick="increment()">+1</button>
+  </div>
+
+  <script>
+    let clicks = parseInt(localStorage.getItem("clicks")) || 0;
+    const clickBtn = document.getElementById("clickBtn");
+
+    const levels = [
+      ["I", 0], // Начинаем с 0 кликов для уровня I
+      ["II", 100], ["III", 200], ["IV", 350], ["V", 500],
+      ["VI", 800], ["VII", 1200], ["VIII", 1300], ["IX", 1555],
+      ["X", 1800], ["XI", 2000], ["XII", 2300], ["XIII", 2500],
+      ["XIV", 2800], ["XV", 3000], ["XVI", 3400], ["XVII", 3700],
+      ["XVIII", 5500]
+    ];
+
+    function getLevel(currentClicks) {
+      for (let i = levels.length - 1; i >= 0; i--) {
+        if (currentClicks >= levels[i][1]) {
+          // Если текущие клики больше или равны порогу уровня, возвращаем этот уровень
+          if (i === levels.length - 1 && currentClicks >= levels[i][1]) {
+            return "чувак ты че?"; // Для последнего уровня, если клики больше или равны его порогу
+          }
+          return `Сложность: ${levels[i][0]}`;
+        }
+      }
+      return "Сложность: I"; // Если не найдено подходящего уровня, по умолчанию уровень I
+    }
+
+    function updateStyle(clicks) {
+      const el = document.getElementById("clicks");
+      el.className = "";
+      if (clicks >= 5500) el.classList.add("crazy");
+      else if (clicks >= 3000) el.classList.add("rgbd");
+      else if (clicks >= 1500) el.classList.add("rainbow");
+      else if (clicks >= 500) el.classList.add("neon");
+    }
+
+    function getClickPower(clicks) {
+      if (clicks >= 5500) return Math.floor(40 + Math.random() * 20); // 40-59
+      if (clicks >= 2500) return 15;
+      if (clicks >= 2000) return 10;
+      if (clicks >= 350) return 3;
+      return 1;
+    }
+
+    function increment() {
+      const clickPower = getClickPower(clicks);
+      clicks += clickPower;
+      localStorage.setItem("clicks", clicks);
+      document.getElementById("clicks").textContent = clicks;
+      document.getElementById("level").textContent = getLevel(clicks);
+      updateStyle(clicks);
+      clickBtn.textContent = `+${clickPower}`;
+    }
+
+    // Инициализация при загрузке страницы
+    document.getElementById("clicks").textContent = clicks;
+    document.getElementById("level").textContent = getLevel(clicks);
+    updateStyle(clicks);
+    clickBtn.textContent = `+${getClickPower(clicks)}`;
+  </script>
+</body>
+</html>
